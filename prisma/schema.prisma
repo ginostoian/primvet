@@ -1,0 +1,388 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  name                String
+  role                String               @default("ADMIN")
+  passwordHash        String
+  active              Boolean              @default(true)
+  lastLoginAt         DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  sessions            AdminSession[]
+  resetTokens         PasswordResetToken[]
+  createdEvents       MedicalEvent[]       @relation("CreatedMedicalEvents")
+  createdAppointments Appointment[]        @relation("CreatedAppointments")
+  auditLogs           AuditLog[]
+}
+
+model AuditLog {
+  id         String     @id @default(cuid())
+  actorId    String?
+  actor      AdminUser? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String
+  entityId   String?
+  summary    String
+  metadata   String?
+  createdAt  DateTime   @default(now())
+}
+
+model AdminSession {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  userId    String
+  user      AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  userId    String
+  user      AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Owner {
+  id                    String             @id @default(cuid())
+  firstName             String
+  lastName              String
+  phone                 String
+  email                 String?
+  address               String?
+  city                  String?
+  county                String?
+  preferredContact      String             @default("PHONE")
+  gdprConsentAt         DateTime?
+  marketingConsent      Boolean            @default(false)
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  notes                 String?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  pets                  Pet[]
+  intakeSubmissions     IntakeSubmission[]
+  appointments          Appointment[]
+  checkIns              CheckIn[]
+  treatmentPlans        TreatmentPlan[]
+}
+
+model Pet {
+  id                 String              @id @default(cuid())
+  ownerId            String
+  owner              Owner               @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name               String
+  species            String
+  breed              String?
+  sex                String?
+  birthDate          DateTime?
+  color              String?
+  microchipNumber    String?             @unique
+  reproductiveStatus String?
+  weightKg           Float?
+  allergies          String?
+  chronicConditions  String?
+  diet               String?
+  insuranceProvider  String?
+  notes              String?
+  active             Boolean             @default(true)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  intakeSubmissions  IntakeSubmission[]
+  medicalEvents      MedicalEvent[]
+  appointments       Appointment[]
+  checkIns           CheckIn[]
+  treatmentPlans     TreatmentPlan[]
+  vaccinations       VaccinationRecord[]
+  prescriptions      Prescription[]
+  labResults         LabResult[]
+  imagingStudies     ImagingStudy[]
+  procedures         ProcedureRecord[]
+}
+
+model IntakeSubmission {
+  id             String    @id @default(cuid())
+  ownerName      String
+  ownerEmail     String?
+  ownerPhone     String
+  petName        String
+  species        String?
+  reason         String
+  urgency        String    @default("NORMAL")
+  status         String    @default("IN_ASTEPTARE")
+  response       String?
+  triageNotes    String?
+  source         String    @default("WEBSITE")
+  submittedAt    DateTime  @default(now())
+  respondedAt    DateTime?
+  archivedAt     DateTime?
+  ownerId        String?
+  owner          Owner?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  petId          String?
+  pet            Pet?      @relation(fields: [petId], references: [id], onDelete: SetNull)
+}
+
+model StaffMember {
+  id           String        @id @default(cuid())
+  name         String
+  role         String        @default("MEDIC")
+  email        String?
+  phone        String?
+  color        String        @default("#5FC9A8")
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  appointments Appointment[]
+  medicalEvents MedicalEvent[]
+}
+
+model Room {
+  id           String        @id @default(cuid())
+  name         String
+  type         String        @default("CABINET")
+  active       Boolean       @default(true)
+  appointments Appointment[]
+}
+
+model AppointmentType {
+  id              String        @id @default(cuid())
+  name            String
+  durationMinutes Int           @default(30)
+  color           String        @default("#BBD7F0")
+  active          Boolean       @default(true)
+  appointments    Appointment[]
+}
+
+model Appointment {
+  id                 String           @id @default(cuid())
+  ownerId            String?
+  owner              Owner?           @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  petId              String?
+  pet                Pet?             @relation(fields: [petId], references: [id], onDelete: SetNull)
+  staffMemberId      String?
+  staffMember        StaffMember?     @relation(fields: [staffMemberId], references: [id], onDelete: SetNull)
+  roomId             String?
+  room               Room?            @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  appointmentTypeId  String?
+  appointmentType    AppointmentType? @relation(fields: [appointmentTypeId], references: [id], onDelete: SetNull)
+  status             String           @default("PROGRAMATA")
+  source             String           @default("ADMIN")
+  startAt            DateTime
+  endAt              DateTime
+  reason             String
+  notes              String?
+  cancellationReason String?
+  waitlistRank       Int?
+  checkedInAt        DateTime?
+  checkedOutAt       DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  createdById        String?
+  createdBy          AdminUser?       @relation("CreatedAppointments", fields: [createdById], references: [id], onDelete: SetNull)
+  checkIn            CheckIn?
+  medicalEvents      MedicalEvent[]
+  treatmentPlans     TreatmentPlan[]
+}
+
+model CheckIn {
+  id                  String       @id @default(cuid())
+  appointmentId       String?      @unique
+  appointment         Appointment? @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  ownerId             String?
+  owner               Owner?       @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  petId               String?
+  pet                 Pet?         @relation(fields: [petId], references: [id], onDelete: SetNull)
+  status              String       @default("IN_ASTEPTARE")
+  visitReason         String
+  presentingComplaint String?
+  estimatedCostCents  Int?
+  consentSignedAt     DateTime?
+  paymentStatus       String       @default("NEPLATIT")
+  paidCents           Int          @default(0)
+  checkedInAt         DateTime     @default(now())
+  checkedOutAt        DateTime?
+  dischargeNotes      String?
+}
+
+model MedicalEvent {
+  id              String             @id @default(cuid())
+  petId           String
+  pet             Pet                @relation(fields: [petId], references: [id], onDelete: Cascade)
+  appointmentId   String?
+  appointment     Appointment?       @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  staffMemberId   String?
+  staffMember     StaffMember?       @relation(fields: [staffMemberId], references: [id], onDelete: SetNull)
+  type            String             @default("CONSULTATIE")
+  title           String
+  occurredAt      DateTime           @default(now())
+  summary         String?
+  diagnosis       String?
+  treatment       String?
+  recommendations String?
+  followUpAt      DateTime?
+  costCents       Int?
+  attachmentsNote String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  createdById     String?
+  createdBy       AdminUser?         @relation("CreatedMedicalEvents", fields: [createdById], references: [id], onDelete: SetNull)
+  soapNote        SoapNote?
+  vaccinations    VaccinationRecord[]
+  prescriptions   Prescription[]
+  labResults      LabResult[]
+  imagingStudies  ImagingStudy[]
+  procedures      ProcedureRecord[]
+}
+
+model SoapNote {
+  id              String       @id @default(cuid())
+  medicalEventId  String       @unique
+  medicalEvent    MedicalEvent @relation(fields: [medicalEventId], references: [id], onDelete: Cascade)
+  subjective      String?
+  objective       String?
+  assessment      String?
+  plan            String?
+  diagnosis       String?
+  treatment       String?
+  recommendations String?
+  followUpAt      DateTime?
+}
+
+model VaccinationRecord {
+  id             String        @id @default(cuid())
+  petId          String
+  pet            Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+  medicalEventId String?
+  medicalEvent   MedicalEvent? @relation(fields: [medicalEventId], references: [id], onDelete: SetNull)
+  vaccineName    String
+  manufacturer   String?
+  batchNumber    String?
+  expiresAt      DateTime?
+  administeredAt DateTime      @default(now())
+  nextDueAt      DateTime?
+  veterinarian   String?
+  notes          String?
+}
+
+model Prescription {
+  id             String        @id @default(cuid())
+  petId          String
+  pet            Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+  medicalEventId String?
+  medicalEvent   MedicalEvent? @relation(fields: [medicalEventId], references: [id], onDelete: SetNull)
+  medicineName   String
+  dosage         String
+  route          String?
+  frequency      String?
+  duration       String?
+  instructions   String?
+  createdAt      DateTime      @default(now())
+}
+
+model LabResult {
+  id             String        @id @default(cuid())
+  petId          String
+  pet            Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+  medicalEventId String?
+  medicalEvent   MedicalEvent? @relation(fields: [medicalEventId], references: [id], onDelete: SetNull)
+  testName       String
+  status         String        @default("CERUT")
+  requestedAt    DateTime      @default(now())
+  receivedAt     DateTime?
+  resultSummary  String?
+  fileUrl        String?
+}
+
+model ImagingStudy {
+  id             String        @id @default(cuid())
+  petId          String
+  pet            Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+  medicalEventId String?
+  medicalEvent   MedicalEvent? @relation(fields: [medicalEventId], references: [id], onDelete: SetNull)
+  type           String
+  bodyRegion     String?
+  status         String        @default("CERUT")
+  performedAt    DateTime?
+  findings       String?
+  fileUrl        String?
+}
+
+model ProcedureRecord {
+  id             String        @id @default(cuid())
+  petId          String
+  pet            Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+  medicalEventId String?
+  medicalEvent   MedicalEvent? @relation(fields: [medicalEventId], references: [id], onDelete: SetNull)
+  name           String
+  anesthesia     String?
+  performedAt    DateTime      @default(now())
+  outcome        String?
+  notes          String?
+}
+
+model TreatmentPlan {
+  id                  String              @id @default(cuid())
+  ownerId             String?
+  owner               Owner?              @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  petId               String
+  pet                 Pet                 @relation(fields: [petId], references: [id], onDelete: Cascade)
+  appointmentId       String?
+  appointment         Appointment?        @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+  title               String
+  status              String              @default("DRAFT")
+  diagnosis           String?
+  totalEstimatedCents Int                 @default(0)
+  approvedAt          DateTime?
+  approvedByName      String?
+  notes               String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  items               TreatmentPlanItem[]
+}
+
+model TreatmentPlanItem {
+  id                 String        @id @default(cuid())
+  treatmentPlanId    String
+  treatmentPlan      TreatmentPlan @relation(fields: [treatmentPlanId], references: [id], onDelete: Cascade)
+  stepOrder          Int           @default(1)
+  kind               String        @default("SERVICIU")
+  name               String
+  dosage             String?
+  frequency          String?
+  duration           String?
+  quantity           Float?
+  unit               String?
+  estimatedCostCents Int           @default(0)
+  instructions       String?
+}
+
+model InventoryItem {
+  id              String   @id @default(cuid())
+  name            String
+  category        String   @default("MEDICAMENT")
+  sku             String?
+  batchNumber     String?
+  manufacturer    String?
+  supplier        String?
+  quantity        Float    @default(0)
+  unit            String   @default("buc")
+  minQuantity     Float    @default(0)
+  expiresAt       DateTime?
+  storageLocation String?
+  status          String   @default("ACTIV")
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

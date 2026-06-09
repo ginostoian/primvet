@@ -1,7 +1,13 @@
 import { ContactPanel } from "@/components/contact-panel";
 import { SectionHeading } from "@/components/section-heading";
 
-export default function ContactPage() {
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ sent?: string }>;
+}) {
+  const params = await searchParams;
+
   return (
     <>
       <section className="bg-white py-section">
@@ -13,7 +19,7 @@ export default function ContactPage() {
           />
         </div>
       </section>
-      <ContactPanel />
+      <ContactPanel sent={params.sent === "1"} />
     </>
   );
 }

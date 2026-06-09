@@ -1,0 +1,2 @@
+-- No-op.
+-- AuditLog and InventoryItem are included in the PostgreSQL baseline migration.

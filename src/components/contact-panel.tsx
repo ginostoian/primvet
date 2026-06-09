@@ -1,9 +1,10 @@
 import { CalendarBlank, Clock, MapPin, Phone } from "@phosphor-icons/react/dist/ssr";
 
 import { Button } from "@/components/ui/button";
+import { createPublicIntake } from "@/lib/actions";
 import { address, phone } from "@/lib/site-data";
 
-export function ContactPanel() {
+export function ContactPanel({ sent = false }: { sent?: boolean }) {
   return (
     <section id="programare" className="bg-cloud py-section">
       <div className="container-content grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
@@ -14,7 +15,13 @@ export function ContactPanel() {
           <h2 className="mt-3 font-display text-3xl font-semibold text-navy-900 md:text-4xl">
             Trimite-ne detaliile vizitei
           </h2>
-          <form className="mt-8 grid gap-5">
+          {sent ? (
+            <div className="mt-8 rounded-lg border border-success/30 bg-green-300/35 p-4 font-semibold text-navy-900">
+              Cererea a fost trimisă. Echipa Prim Vet te va contacta pentru
+              confirmare.
+            </div>
+          ) : null}
+          <form action={createPublicIntake} className="mt-8 grid gap-5">
             <div className="grid gap-2">
               <label className="font-medium text-navy-900" htmlFor="name">
                 Nume
@@ -24,6 +31,7 @@ export function ContactPanel() {
                 name="name"
                 className="rounded border border-slate-400 px-4 py-3 text-base placeholder:text-slate-400 focus:border-navy-700"
                 placeholder="Numele tău"
+                required
               />
             </div>
             <div className="grid gap-5 md:grid-cols-2">
@@ -36,8 +44,23 @@ export function ContactPanel() {
                   name="phone"
                   className="rounded border border-slate-400 px-4 py-3 text-base placeholder:text-slate-400 focus:border-navy-700"
                   placeholder="07XX XXX XXX"
+                  required
                 />
               </div>
+              <div className="grid gap-2">
+                <label className="font-medium text-navy-900" htmlFor="email">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  className="rounded border border-slate-400 px-4 py-3 text-base placeholder:text-slate-400 focus:border-navy-700"
+                  placeholder="nume@email.ro"
+                />
+              </div>
+            </div>
+            <div className="grid gap-5 md:grid-cols-3">
               <div className="grid gap-2">
                 <label className="font-medium text-navy-900" htmlFor="pet">
                   Companion
@@ -46,8 +69,35 @@ export function ContactPanel() {
                   id="pet"
                   name="pet"
                   className="rounded border border-slate-400 px-4 py-3 text-base placeholder:text-slate-400 focus:border-navy-700"
+                  placeholder="Nume companion"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <label className="font-medium text-navy-900" htmlFor="species">
+                  Specie
+                </label>
+                <input
+                  id="species"
+                  name="species"
+                  className="rounded border border-slate-400 px-4 py-3 text-base placeholder:text-slate-400 focus:border-navy-700"
                   placeholder="Câine, pisică..."
                 />
+              </div>
+              <div className="grid gap-2">
+                <label className="font-medium text-navy-900" htmlFor="urgency">
+                  Urgență
+                </label>
+                <select
+                  id="urgency"
+                  name="urgency"
+                  className="rounded border border-slate-400 px-4 py-3 text-base focus:border-navy-700"
+                  defaultValue="NORMAL"
+                >
+                  <option value="NORMAL">Normal</option>
+                  <option value="RAPID">Rapid</option>
+                  <option value="URGENT">Urgent</option>
+                </select>
               </div>
             </div>
             <div className="grid gap-2">
@@ -60,6 +110,7 @@ export function ContactPanel() {
                 rows={5}
                 className="rounded border border-slate-400 px-4 py-3 text-base placeholder:text-slate-400 focus:border-navy-700"
                 placeholder="Spune-ne pe scurt ce simptome sau ce serviciu te interesează."
+                required
               />
             </div>
             <Button type="submit" size="lg" className="w-full md:w-fit">

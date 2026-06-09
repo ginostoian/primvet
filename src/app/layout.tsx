@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
 
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-
 import "./globals.css";
 import { body, display } from "./fonts";
 
@@ -20,9 +17,7 @@ export default function RootLayout({
   return (
     <html lang="ro" className={`${display.variable} ${body.variable}`}>
       <body>
-        <SiteHeader />
-        <main>{children}</main>
-        <SiteFooter />
+        {children}
       </body>
     </html>
   );
