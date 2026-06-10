@@ -14,10 +14,14 @@ import { Button } from "@/components/ui/button";
 import {
   actionCards,
   articles,
+  doctorExperience,
+  doctorName,
+  doctorTitle,
   phone,
   reasons,
   services,
 } from "@/lib/site-data";
+import { JsonLd, pageSchema, servicesItemListSchema } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 const toneClasses: Record<string, string> = {
@@ -30,6 +34,17 @@ const toneClasses: Record<string, string> = {
 export default function Home() {
   return (
     <>
+      <JsonLd
+        data={[
+          pageSchema({
+            path: "/",
+            title: "Prim Vet Iași | Cabinet veterinar și ortopedie veterinară",
+            description:
+              "Cabinet veterinar în Iași pentru ortopedie, consultații, prevenție, chirurgie, stomatologie și monitorizare medicală pentru câini și pisici.",
+          }),
+          servicesItemListSchema(),
+        ]}
+      />
       <section className="bg-white pb-10 pt-6 md:pb-14">
         <div className="container-content">
           <div className="relative isolate min-h-[610px] overflow-hidden rounded-[2.25rem] bg-brand-600 px-6 py-8 text-white shadow-lift md:min-h-[670px] md:px-12 lg:px-16">
@@ -52,13 +67,13 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative z-40 mt-24 max-w-[520px] md:mt-36">
-              <h1 className="font-display text-[3.7rem] font-semibold leading-[0.96] text-white sm:text-[4.8rem] md:text-[5.8rem] lg:text-[6rem]">
-                Pentru animale, pe viață
+            <div className="relative z-40 mt-20 max-w-[640px] md:mt-28 lg:max-w-[620px]">
+              <h1 className="font-display text-[3rem] font-semibold leading-[1.02] text-white sm:text-[4rem] md:text-[4.7rem] lg:text-[4.9rem]">
+                Ortopedie și medicină veterinară în Iași
               </h1>
               <p className="mt-8 max-w-[45ch] text-xl text-white/88">
-                Cabinet veterinar în Iași pentru consultații, prevenție și
-                îngrijire clar explicată.
+                Consultații, prevenție, chirurgie și evaluări ortopedice pentru
+                câini și pisici, sub coordonarea {doctorName}.
               </p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row lg:hidden">
                 <Button asChild variant="light" size="lg">
@@ -133,7 +148,7 @@ export default function Home() {
           <SectionHeading
             eyebrow="Servicii"
             title="Îngrijire veterinară pentru fiecare etapă"
-            text="De la prima schemă de vaccinare până la controale pentru seniori, Prim Vet pune accent pe prevenție, diagnostic clar și tratamente explicate."
+            text="De la prima schemă de vaccinare până la dureri articulare, traumatisme și controale pentru seniori, Prim Vet pune accent pe diagnostic clar, prevenție și tratamente explicate."
           />
           <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {services.slice(0, 6).map((service) => (
@@ -148,6 +163,11 @@ export default function Home() {
           <h2 className="mx-auto max-w-[950px] text-center font-display text-[3.4rem] font-semibold leading-none text-navy-900 md:text-[5.8rem]">
             De ce au încredere stăpânii în noi
           </h2>
+          <p className="mx-auto mt-6 max-w-[760px] text-center text-lg text-slate-600">
+            {doctorName}, {doctorTitle}, are {doctorExperience}. Această
+            experiență se vede în felul în care analizăm fiecare caz: întâi
+            cauza, apoi tratamentul.
+          </p>
           <div className="mt-16 grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
             <div className="grid gap-5">
             {reasons.map((reason) => {
@@ -188,18 +208,19 @@ export default function Home() {
         <div className="container-content grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase text-navy-700">
-              Prim Card
+              Ortopedie veterinară
             </p>
             <h2 className="mt-3 font-display text-3xl font-semibold text-navy-900 md:text-4xl">
-              Prevenție planificată, costuri mai ușor de anticipat
+              Șchiopătatul, durerea sau trauma merită evaluate corect
             </h2>
             <p className="mt-5 max-w-[62ch] text-lg text-navy-900/80">
-              Un abonament de îngrijire pentru controale periodice, vaccinuri,
-              deparazitări și beneficii la servicii uzuale.
+              În ortopedie, o decizie bună începe cu examinare atentă, istoric,
+              evaluarea mersului și investigații recomandate doar când schimbă
+              planul medical.
             </p>
             <Button asChild className="mt-8">
-              <Link href="/preturi">
-                Vezi beneficiile
+              <Link href="/servicii/ortopedie-veterinara">
+                Vezi serviciul
                 <ArrowRight aria-hidden className="h-5 w-5" />
               </Link>
             </Button>
@@ -207,10 +228,10 @@ export default function Home() {
           <div className="rounded-2xl bg-white p-8 shadow-card">
             <ul className="grid gap-5">
               {[
-                "Control anual inclus",
-                "Plan de vaccinare urmărit",
-                "Reduceri la servicii preventive",
-                "Reminder pentru vizitele importante",
+                "Consultație ortopedică pentru câini și pisici",
+                "Evaluarea mersului, durerii și mobilității",
+                "Plan pentru traumatisme, fracturi și recuperare",
+                "A doua opinie cu documentele medicale existente",
               ].map((item) => (
                 <li key={item} className="flex gap-3 text-navy-900">
                   <CheckCircle
@@ -323,12 +344,12 @@ export default function Home() {
               Despre cabinet
             </p>
             <h2 className="mt-3 font-display text-3xl font-semibold text-white md:text-4xl">
-              Aproape de stăpâni, atent cu fiecare pacient
+              Experiență universitară, comunicare pe înțelesul familiei
             </h2>
             <p className="mt-5 max-w-[62ch] text-lg text-white/78">
-              Prim Vet este construit ca un cabinet de cartier cu standarde
-              moderne: consultații atente, prevenție bine planificată și
-              comunicare directă cu familia animalului.
+              Prim Vet combină rigoarea medicală cu un mod de lucru calm:
+              examinare atentă, opțiuni explicate, recomandări responsabile și
+              urmărirea pacientului după vizită.
             </p>
             <Button asChild variant="accent" className="mt-8">
               <Link href="/despre">

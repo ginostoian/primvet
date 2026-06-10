@@ -2,7 +2,12 @@ import { CalendarBlank, Clock, MapPin, Phone } from "@phosphor-icons/react/dist/
 
 import { Button } from "@/components/ui/button";
 import { createPublicIntake } from "@/lib/actions";
-import { address, phone } from "@/lib/site-data";
+import {
+  address,
+  googleMapsEmbedUrl,
+  googleMapsUrl,
+  phone,
+} from "@/lib/site-data";
 
 export function ContactPanel({ sent = false }: { sent?: boolean }) {
   return (
@@ -15,6 +20,11 @@ export function ContactPanel({ sent = false }: { sent?: boolean }) {
           <h2 className="mt-3 font-display text-3xl font-semibold text-navy-900 md:text-4xl">
             Trimite-ne detaliile vizitei
           </h2>
+          <p className="mt-4 text-slate-600">
+            Pentru cazurile ortopedice, menționează când a apărut șchiopătatul,
+            dacă a existat un traumatism și ce tratamente sau investigații au
+            fost făcute până acum.
+          </p>
           {sent ? (
             <div className="mt-8 rounded-lg border border-success/30 bg-green-300/35 p-4 font-semibold text-navy-900">
               Cererea a fost trimisă. Echipa Prim Vet te va contacta pentru
@@ -109,7 +119,7 @@ export function ContactPanel({ sent = false }: { sent?: boolean }) {
                 name="message"
                 rows={5}
                 className="rounded border border-slate-400 px-4 py-3 text-base placeholder:text-slate-400 focus:border-navy-700"
-                placeholder="Spune-ne pe scurt ce simptome sau ce serviciu te interesează."
+                placeholder="Spune-ne simptomele, durata lor, serviciul dorit și dacă există analize sau radiografii anterioare."
                 required
               />
             </div>
@@ -136,25 +146,46 @@ export function ContactPanel({ sent = false }: { sent?: boolean }) {
               </li>
               <li className="flex gap-3">
                 <MapPin aria-hidden className="mt-1 h-5 w-5 text-mint-300" />
-                <span>{address}</span>
+                <a
+                  href={googleMapsUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-white"
+                >
+                  {address}
+                </a>
               </li>
               <li className="flex gap-3">
                 <Clock aria-hidden className="mt-1 h-5 w-5 text-mint-300" />
-                <span>Luni - Vineri, 09:00 - 18:00 · Sâmbătă cu programare</span>
+                <span>
+                  Luni - Vineri, 09:00 - 18:00 · Sâmbătă cu programare
+                </span>
               </li>
             </ul>
           </div>
 
-          <div className="min-h-[280px] rounded-2xl border-2 border-dashed border-navy-100 bg-white p-8 shadow-soft">
-            <p className="text-sm font-semibold uppercase text-navy-700">
-              Hartă Iași
-            </p>
-            <div className="mt-10 grid place-items-center text-center">
-              <MapPin aria-hidden className="h-12 w-12 text-mint-500" />
-              <p className="mt-4 max-w-[32ch] text-slate-600">
-                Embed-ul Google Maps poate fi conectat după confirmarea adresei
-                exacte a cabinetului.
+          <div className="overflow-hidden rounded-2xl bg-white shadow-soft">
+            <iframe
+              src={googleMapsEmbedUrl}
+              title={`Hartă Google Maps pentru ${address}`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="h-[360px] w-full border-0"
+              allowFullScreen
+            />
+            <div className="p-6">
+              <p className="text-sm font-semibold uppercase text-navy-700">
+                Hartă Iași
               </p>
+              <a
+                href={googleMapsUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 inline-flex items-center gap-2 font-semibold text-navy-900 hover:underline hover:underline-offset-4"
+              >
+                <MapPin aria-hidden className="h-5 w-5 text-mint-500" />
+                Deschide în Google Maps
+              </a>
             </div>
           </div>
         </div>

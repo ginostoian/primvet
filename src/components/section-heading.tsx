@@ -6,6 +6,7 @@ type SectionHeadingProps = {
   text?: string;
   align?: "left" | "center";
   className?: string;
+  titleAs?: "h1" | "h2";
 };
 
 export function SectionHeading({
@@ -14,7 +15,10 @@ export function SectionHeading({
   text,
   align = "left",
   className,
+  titleAs = "h2",
 }: SectionHeadingProps) {
+  const Title = titleAs;
+
   return (
     <div
       className={cn(
@@ -28,9 +32,9 @@ export function SectionHeading({
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="mt-3 font-display text-3xl font-semibold text-navy-900 md:text-4xl">
+      <Title className="mt-3 font-display text-3xl font-semibold text-navy-900 md:text-4xl">
         {title}
-      </h2>
+      </Title>
       {text ? <p className="mt-4 text-lg text-slate-600">{text}</p> : null}
     </div>
   );
